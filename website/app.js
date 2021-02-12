@@ -11,11 +11,13 @@ document.getElementById('generate').addEventListener('click', performAction);
 function performAction(e) {
     const zipCode = document.getElementById('zip').value;
     const feelings = document.getElementById('feelings').value;
+    const selectedUnit = document.getElementById("units").value;
+
     document.getElementById('date').innerText = '';
     document.getElementById('temp').innerText = '';
     document.getElementById('content').innerText = '';
     if ( zipCode ) {
-        getAPIWeatherData(zipCode, apiKey, feelings)
+        getAPIWeatherData(zipCode, apiKey, feelings, selectedUnit)
         .then(data => {
             if(data) {
                 if ( feelings ) {
@@ -24,6 +26,11 @@ function performAction(e) {
                     data.content = ''
                 }
                 data.date = newDate
+                if ( selectedUnit == 'imperial' ){
+                    data.main.type = 'F'
+                }else {
+                    data.main.type = 'C'
+                }
                 postWeatherData('/addData', data)
                 getWeatherData('/allData')
             }
@@ -34,8 +41,8 @@ function performAction(e) {
 }
 
 // get Weather data from the API of openweathermap.org
-const getAPIWeatherData = async (zip, key, content) => {
-    const baseURL = `https://api.openweathermap.org/data/2.5/weather?zip=${zip}&appid=${key}`
+const getAPIWeatherData = async (zip, key, content, unit) => {
+    const baseURL = `https://api.openweathermap.org/data/2.5/weather?zip=${zip}&appid=${key}&units=${unit}`
     const res = await fetch(baseURL)
     try {
         const data = await res.json();
@@ -82,7 +89,7 @@ const getWeatherData = async (url = '') => {
     try {
         const newData = await response.json();
         document.getElementById('date').innerText = "date : " + newData.date;
-        document.getElementById('temp').innerText = "temp : " + newData.temp;
+        document.getElementById('temp').innerText = "temp : " + newData.temp + ' °' + newData.type;
         if (newData.content.length > 0) {
             document.getElementById('content').innerText = "content : " + newData.content;
         } else {

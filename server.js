@@ -32,6 +32,7 @@ app.post('/addData', function (request, response) {
     let storedData = {
         date: postedData.date,
         temp: postedData.main.temp,
+        type: postedData.main.type,
         content: postedData.content,
     }
     projectData = storedData
